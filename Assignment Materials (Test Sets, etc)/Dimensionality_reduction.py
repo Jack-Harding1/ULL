@@ -7,45 +7,59 @@ Created on Thu Apr  5 20:20:18 2018
 """
 
 import numpy as np
-import pandas as pd
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 def run_experiment_one():
     word_embeddings_file = open("deps.words", "r")
-    return PCA_reduction(word_embeddings_file)
+    test_file = open("2000_nouns_sorted.txt", "r")
+    return PCA_reduction(word_embeddings_file, test_file)
     
 def run_experiment_two():
     word_embeddings_file = open("bow2.words", "r")
-    return PCA_reduction(word_embeddings_file)
+    test_file = open("2000_nouns_sorted.txt", "r")
+    return PCA_reduction(word_embeddings_file, test_file)
     
 def run_experiment_three():
     word_embeddings_file = open("bow5.words", "r")
-    return PCA_reduction(word_embeddings_file)
+    test_file = open("2000_nouns_sorted.txt", "r")
+    return PCA_reduction(word_embeddings_file, test_file)
 
-def PCA_reduction(word_embeddings):
+def PCA_reduction(word_embeddings, test_file):
+    word_embedding_dictionary = defaultdict()
     word_embedding_list = word_embeddings.read().split("\n")
-    word_embedding_targets = []
-    word_embeddings = np.zeros(shape=(len(word_embedding_list), len(word_embedding_list[0].split(" ")) - 1))
-    for row, embedding in enumerate(word_embedding_list):
+    for embedding in word_embedding_list:
         embedding_list = embedding.split(" ")
-        if len(embedding_list) == len(word_embedding_list[0].split(" ")):
-            word_embedding_targets.append(embedding_list[0])
-            word_embeddings[row] = [float(i) for i in embedding_list[1:]]
+        word_embedding_dictionary[embedding_list[0]] = [float(i) for i in embedding_list[1:]]
     
-    feat_cols = ["dimension"+str(i) for i in range(word_embeddings.shape[1])]
-    df = pd.DataFrame(word_embeddings, columns=feat_cols)
-    df['label'] = pd.Series(word_embedding_targets)
-    df['label'] = df['label'].apply(lambda i: str(i))
+    top_embeddings_list = []
+    top_word_list = []
+    test_list = test_file.read().split("\n")
+    for line in test_list:
+        test_word = line.strip()
+        if test_word in word_embedding_dictionary.keys() and len(word_embedding_dictionary[test_word]) == 300:
+            top_embeddings_list.append(word_embedding_dictionary[test_word])
+            top_word_list.append(test_word)
     
-    print(df.loc[:3000, :])
-
-
-    pca = PCA(n_components=2)
-    pca_result = pca.fit_transform(df[feat_cols].values)
-    df['pca-one'] = pca_result[:,0]
-    df['pca-two'] = pca_result[:,1] 
-    print('Explained variation per principal component: {}'.format(pca.explained_variance_ratio_))
+    top_embeddings_list = np.array(top_embeddings_list)
+    pca = PCA(n_components=2, random_state = 0)
+    pca_result = pca.fit_transform(top_embeddings_list)
+    x = []
+    y = []
+    for value in pca_result:
+        x.append(value[0])
+        y.append(value[1])
+    plt.figure(figsize=(25, 25)) 
+    for i in range(len(x)):
+        plt.scatter(x[i],y[i])
+        plt.annotate(top_word_list[i],
+                     xy=(x[i], y[i]),
+                     xytext=(5, 2),
+                     textcoords='offset points',
+                     ha='right',
+                     va='bottom')
+    plt.savefig('PCA_clusters.png', bbox_inches='tight')
 
 
     
