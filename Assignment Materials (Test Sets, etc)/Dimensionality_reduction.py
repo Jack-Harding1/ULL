@@ -14,19 +14,22 @@ from collections import defaultdict
 def run_experiment_one():
     word_embeddings_file = open("deps.words", "r")
     test_file = open("2000_nouns_sorted.txt", "r")
-    return PCA_reduction(word_embeddings_file, test_file)
+    cluster_file = "Dependency_Clusters.pdf"
+    return PCA_reduction(word_embeddings_file, test_file, cluster_file)
     
 def run_experiment_two():
     word_embeddings_file = open("bow2.words", "r")
     test_file = open("2000_nouns_sorted.txt", "r")
-    return PCA_reduction(word_embeddings_file, test_file)
+    cluster_file = "Bow2_Clusters.pdf"
+    return PCA_reduction(word_embeddings_file, test_file, cluster_file)
     
 def run_experiment_three():
     word_embeddings_file = open("bow5.words", "r")
     test_file = open("2000_nouns_sorted.txt", "r")
-    return PCA_reduction(word_embeddings_file, test_file)
+    cluster_file = "Bow5_Clusters.pdf"
+    return PCA_reduction(word_embeddings_file, test_file, cluster_file)
 
-def PCA_reduction(word_embeddings, test_file):
+def PCA_reduction(word_embeddings, test_file, cluster_file):
     word_embedding_dictionary = defaultdict()
     word_embedding_list = word_embeddings.read().split("\n")
     for embedding in word_embedding_list:
@@ -59,8 +62,10 @@ def PCA_reduction(word_embeddings, test_file):
                      textcoords='offset points',
                      ha='right',
                      va='bottom')
-    plt.savefig('PCA_clusters.png', bbox_inches='tight')
+    plt.savefig(cluster_file, bbox_inches='tight')
 
 
     
 print(run_experiment_one())
+print(run_experiment_two())
+print(run_experiment_three())
