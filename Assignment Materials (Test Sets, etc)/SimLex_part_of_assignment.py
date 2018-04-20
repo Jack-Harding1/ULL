@@ -38,7 +38,7 @@ def run_simlex_similarity_test(word_embeddings, test_file):
             if word1 in word_embedding_dictionary.keys() and word2 in word_embedding_dictionary.keys():
                 cosine_score = 1 - cosine(word_embedding_dictionary[word1], word_embedding_dictionary[word2])
                 embeddings_score_list.append(cosine_score)
-                simlex_score_list.append(line_list[3])
+                simlex_score_list.append(float(line_list[3]))
     return(spearmanr(embeddings_score_list, simlex_score_list))    
         
 
@@ -82,7 +82,7 @@ def run_simlex_similarity_testb(word_embeddings, test_file):
             if word1 in word_embedding_dictionary.keys() and word2 in word_embedding_dictionary.keys():
                 cosine_score = 1 - cosine(word_embedding_dictionary[word1], word_embedding_dictionary[word2])
                 embeddings_score_list.append(cosine_score)
-                simlex_score_list.append(line_list[3])
+                simlex_score_list.append(float(line_list[3]))
     return(pearsonr(embeddings_score_list, simlex_score_list))    
         
 

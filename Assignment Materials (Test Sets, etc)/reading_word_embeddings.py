@@ -176,8 +176,7 @@ def run_qualitative_MEN_test(word_embedding_dicts, test_file):
     print(fourth_bow5_spearman, fourth_bow5_pearson)
     print(fifth_bow5_spearman, fifth_bow5_pearson)
     print("_______________________________________________________________")
-
-    
+  
     return
 
 deps_dict = run_experiment_one()
