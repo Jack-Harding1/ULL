@@ -94,15 +94,24 @@ def cluster_word_vectors(save_plot=False):
     '''
     # Hyper parameters
     clusters = [2, 5, 10, 30, 33, 45, 75, 100, 150, 175, 200, 300, 400, 500, 822, 1000]
-    word_representations = ['deps.words']
+    word_representations = ['bow5.words']
 
     test_file = open('2000_nouns_sorted.txt', 'r')
 
     print('----------- Start K-Means -----------')
     for rep in word_representations:
         print('   Word Representation: {}'.format(rep))
-        word_embeddings_file = open('deps.words', 'r')
-        embeddings, words = get_embeddings_list(word_embeddings_file, test_file)
+        word_embeddings_file = open(rep, 'r')
+
+        if os.path.exists('./models/embeddings_{}'.format(rep)):
+            embeddings = pickle.load(open('./models/embeddings_{}'.format(rep), 'rb'))
+            words = pickle.load(open('./models/words_{}'.format(rep), 'rb'))
+        else:
+            embeddings, words = get_embeddings_list(word_embeddings_file, test_file)
+            # write
+            pickle.dump(embeddings, open('./models/embeddings_{}'.format(rep), 'wb'))
+            pickle.dump(words, open('./models/words_{}'.format(rep), 'wb'))
+
         embeddings_array = np.array(embeddings)
 
         for cluster in clusters:
@@ -120,13 +129,18 @@ def cluster_word_vectors(save_plot=False):
 def generate_figures(model, rep='default', c_num=0):
     test_file = open('2000_nouns_sorted.txt', 'r')
     word_embeddings_file = open(rep, 'r')
-    embeddings, words = get_embeddings_list(word_embeddings_file, test_file)
 
-    # # write
-    # pickle.dump(embeddings, open('./models/embeddings', 'wb'))
-    # pickle.dump(words, open('./models/words', 'wb'))
+    if os.path.exists('./models/embeddings_{}'.format(rep)):
+        embeddings = pickle.load(open('./models/embeddings_{}'.format(rep), 'rb'))
+        words = pickle.load(open('./models/words_{}'.format(rep), 'rb'))
+    else:
+        embeddings, words = get_embeddings_list(word_embeddings_file, test_file)
+        # write
+        pickle.dump(embeddings, open('./models/embeddings_{}'.format(rep), 'wb'))
+        pickle.dump(words, open('./models/words_{}'.format(rep), 'wb'))
 
     embeddings = np.array(embeddings)
+
     pca = PCA(n_components=2, random_state = 0)
     pca_result = pca.fit_transform(embeddings)
 
@@ -157,11 +171,11 @@ def generate_figures(model, rep='default', c_num=0):
                          va='bottom')
 
     plt.savefig('./results/kmeans/{}_{}.pdf'.format(rep, c_num), bbox_inches='tight')
+    plt.close()
 
 def generate_csv(model, rep='default', c_num=0):
 
-    words = pickle.load(open('./models/words', 'rb'))
-
+    words = pickle.load(open('./models/words_{}'.format(rep), 'rb'))
     clusters = np.arange(model.n_clusters)
     labels = model.labels_
 
@@ -173,7 +187,6 @@ def generate_csv(model, rep='default', c_num=0):
     output_df = None
 
     for key, val in output.items():
-        # print(key, val)
         if val is None:
             val = []
         df = pd.DataFrame({key: val})
@@ -186,11 +199,16 @@ def generate_csv(model, rep='default', c_num=0):
     output_df.to_csv('./results/kmeans/{}_{}.csv'.format(rep, c_num), sep=',', na_rep='')
 
 
+# cluster_word_vectors()
 for file in os.listdir("./models/kmeans/"):
     filepath = os.path.join("./models/kmeans/", file)
     details = file.split('_')
 
     print("------ {} ------".format(file))
     model = pickle.load(open(filepath, 'rb'))
-    generate_figures(model, details[0], int(details[1]))
-    generate_csv(model, details[0], int(details[1]))
+
+    if not os.path.exists('./results/kmeans/{}.pdf'.format(file)):
+        generate_figures(model, details[0], int(details[1]))
+
+    if not os.path.exists('./results/kmeans/{}.csv'.format(file)):
+        generate_csv(model, details[0], int(details[1]))
