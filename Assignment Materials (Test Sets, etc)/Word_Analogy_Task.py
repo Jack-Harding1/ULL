@@ -10,35 +10,28 @@ from collections import defaultdict
 import numpy as np
 import os
 
-#def run_experiment_one():
-#    word_embeddings_file = open("deps.words", "r")
-#    for filename in os.listdir("Analogies/"):
-#        if filename.endswith(".txt"):
-#            print(filename)
-#        test_file = open("Analogies/" + filename, "r") 
-#        result = run_analogy_test(word_embeddings_file, test_file)
-#        print("Score of model {} was {} on part {}".format("deps", result[0], filename))
-#        print("MRR of model {} was {} on part {}".format("deps", result[1], filename))
-#        test_file.close()
+def run_experiment_one():
+    word_embeddings_file = open("deps.words", "r")
+    test_file = open("Analogy-Benchmark.txt", "r")
+    result = run_analogy_test(word_embeddings_file, test_file)
+    print("Score of model {} was {} on part {}".format("deps", result[0], test_file))
+    print("MRR of model {} was {} on part {}".format("deps", result[1], test_file))
+    test_file.close()
 
-#def run_experiment_two():
-#    word_embeddings_file = open("bow2.words", "r")
-#    for filename in os.listdir("Analogies/"):
-#        if not filename.endswith(".txt"):
-#            pass
-#        test_file = open("Analogies/" + filename, "r") 
-#        result = run_analogy_test(word_embeddings_file, test_file)
-#        print("Score of model {} was {} on part {}".format("deps", result[0], filename))
-#        print("MRR of model {} was {} on part {}".format("deps", result[1], filename))    
-#def run_experiment_three():
-#    word_embeddings_file = open("bow5.words", "r")
-#    for filename in os.listdir("Analogies/"):
-#        if not filename.endswith(".txt"):
-#            pass
-#        test_file = open("Analogies/" + filename, "r")
-#        result = run_analogy_test(word_embeddings_file, test_file)
-#        print("Score of model {} was {} on part {}".format("deps", result[0], filename))
-#        print("MRR of model {} was {} on part {}".format("deps", result[1], filename))
+def run_experiment_two():
+    word_embeddings_file = open("bow2.words", "r")
+    test_file = open("Analogy-Benchmark.txt", "r")
+    result = run_analogy_test(word_embeddings_file, test_file)
+    print("Score of model {} was {} on part {}".format("bow2", result[0], test_file))
+    print("MRR of model {} was {} on part {}".format("bow2", result[1], test_file))
+    test_file.close()    
+def run_experiment_three():
+    word_embeddings_file = open("bow5.words", "r")
+    test_file = open("Analogy-Benchmark.txt", "r")
+    result = run_analogy_test(word_embeddings_file, test_file)
+    print("Score of model {} was {} on part {}".format("bow5", result[0], test_file))
+    print("MRR of model {} was {} on part {}".format("bow5", result[1], test_file))
+    test_file.close()
 
 def run_analogy_test(word_embeddings, test_file):
     
@@ -56,9 +49,7 @@ def run_analogy_test(word_embeddings, test_file):
     
     word_embeddings_matrix = np.array(word_embeddings)
     
-    testing_file = open("Analogies/" + test_file, "r")
-    test_list = testing_file.read().split("\n")
-    testing_file.close()
+    test_list = test_file.read().split("\n")
     score = 0
     total_count = 0
     MRR = []
@@ -97,27 +88,12 @@ def run_analogy_test(word_embeddings, test_file):
                 ranking = distances.index(correct_distance)
                 MRR.append(1 / (ranking + 1))
                 
-                print("Analogy from ({} to {}) to ({} to {}): prediction was {}".format(a, a_star, b, b_star, closest_word))
                 if closest_word == b_star:
                     score += 1
                     
     if total_count != 0:                
         return (score / total_count), (sum(MRR)/len(MRR))
     return "NOT IN DATA SET", "NOT IN DATA SET"
-    
-word_embeddings_file = open("deps.words", "r")    
-print(run_analogy_test(word_embeddings_file, "gram8-plural.txt"))
-print(run_analogy_test(word_embeddings_file, "gram5-present-participle.txt"))
-print(run_analogy_test(word_embeddings_file, "gram1-adjective-to-adverb.txt"))
-print(run_analogy_test(word_embeddings_file, "family.txt"))
-"gram8-plural.txt"
-"gram3-comparative.txt"
-"gram2-opposite.txt"
-"gram4-superlative.txt"
-"capital-world.txt"
-"city-in-state.txt"
-"gram9-plural-verbs.txt"
-"gram7-past-tense.txt"
-"capital-common-countries.txt"
-"gram6-nationality-adjective.txt"
-"currency.txt"
+
+run_experiment_two()
+run_experiment_three()
