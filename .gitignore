@@ -1,2 +1,14 @@
+# common
+__pycache__/
+*.pyc
+
 # project 1
+1-evaluating_word_reps/data/Analogies/*
+1-evaluating_word_reps/data/MEN/*
+1-evaluating_word_reps/data/SimLex-999/*
+1-evaluating_word_reps/data/2000_nouns_sorted.txt
+1-evaluating_word_reps/data/bow2.words
+1-evaluating_word_reps/data/bow5.words
+1-evaluating_word_reps/data/deps.words
+
 1-evaluating_word_reps/models/*
