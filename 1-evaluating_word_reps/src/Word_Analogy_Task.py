@@ -66,7 +66,7 @@ def run_analogy_test(word_embeddings, test_file):
             a_star = line_list[1]
             b = line_list[2]
             b_star = line_list[3]
-            if a in word_embedding_names and a_star in word_embedding_names and b in word_embedding_names and b_star in word_embedding_names:
+            if a.lower() in word_embedding_names and a_star.lower() in word_embedding_names and b.lower() in word_embedding_names and b_star.lower() in word_embedding_names:
                 total_count += 1
                 a_index = word_embedding_names.index(a)
                 a_star_index = word_embedding_names.index(a_star)
