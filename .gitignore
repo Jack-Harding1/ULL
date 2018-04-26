@@ -2,6 +2,9 @@
 __pycache__/
 *.pyc
 
+.ipynb_checkpoints
+
+
 # project 1
 1-evaluating_word_reps/data/Analogies/*
 1-evaluating_word_reps/data/MEN/*
@@ -12,3 +15,9 @@ __pycache__/
 1-evaluating_word_reps/data/deps.words
 
 1-evaluating_word_reps/models/*
+
+
+# project 2
+2-learning_word_reps/data/english-french_small/*
+2-learning_word_reps/data/english-french_large/*
+2-learning_word_reps/data/gold_standard_alignments/*
