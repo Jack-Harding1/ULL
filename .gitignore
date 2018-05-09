@@ -22,5 +22,6 @@ __pycache__/
 2-learning_word_reps/data/english-french_large/*
 2-learning_word_reps/data/gold_standard_alignments/*
 2-learning_word_reps/data/lexical_substitution/*
+2-learning_word_reps/data/processed/*
 
 2-learning_word_reps/models/*

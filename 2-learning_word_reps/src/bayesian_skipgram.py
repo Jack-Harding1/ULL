@@ -25,8 +25,8 @@ class BSG_Net(nn.Module):
         self.epsilon = distb.MultivariateNormal(torch.zeros(embedding_dimension), torch.eye(embedding_dimension))
 
         # inference network
-        self.fc1 = nn.Linear(vocabulary_size, embedding_dimension)  # word embedding. TODO: use a different dimension?
-        self.fc2 = nn.Linear(embedding_dimension * 2, embedding_dimension * 2)
+        self.fc1 = nn.Linear(vocabulary_size, embedding_dimension, bias=True)  # word embedding. TODO: use a different dimension?
+        self.fc2 = nn.Linear(embedding_dimension * 2, embedding_dimension * 2, bias=True)
         self.fc3 = nn.Linear(embedding_dimension * 2, embedding_dimension, bias=True)
         self.fc4 = nn.Linear(embedding_dimension * 2, embedding_dimension, bias=True)
         # for reparameterization
