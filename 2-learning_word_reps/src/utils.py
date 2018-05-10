@@ -4,6 +4,50 @@
 @authors: jackharding, akashrajkn
 """
 
+import torch
+
+from bsg_parameters import *
+
+
+# TODO: I don't like global variables: Probably create a class to do all vocabulary stuff?
+global_w2i = dict()
+global_i2w = dict()
+
+
+def create_vocabulary(filepath):
+    '''
+    Creates vocabulary and w2i and i2w dictionaries
+    @param filepath
+    '''
+    global global_w2i
+    global global_i2w
+
+    with open(filepath, 'r') as f:
+        data = f.read().splitlines()
+
+    vocabulary = []
+    for sentence in data:
+        words = sentence.split()
+        for word in words:
+            if word not in vocabulary:
+                vocabulary.append(word)
+
+    for idx, word in enumerate(vocabulary):
+        global_i2w[idx] = word
+        global_w2i[word] = idx
+
+def one_hot(word):
+    '''
+    One-hot vector representation of word
+    @param word
+    @param vocab_size: vocabulary size
+    @return one-hot pytorch vector
+    '''
+    onehot = torch.zeros(VOCABULARY_SIZE)
+    onehot[global_w2i[word]] = 1.0
+
+    return onehot
+
 def _load_data(data, context_size):
     '''
     converts data into required format
@@ -13,7 +57,6 @@ def _load_data(data, context_size):
     @return: [(center_word, [context_words]), (center_word, [context_words]), ...]
     '''
     X = []
-
     for sentence in data:
         words = sentence.split()
         if len(words) == 1:  # ignore sentences of length 1.
@@ -35,7 +78,6 @@ def load_data_from_file(filepath, context_size):
     '''
     loads data from filepath and converts it into required format
     '''
-
     with open(filepath, 'r') as f:
         data = f.read().splitlines()
 

@@ -10,15 +10,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 from time import sleep
 
-
-READ_FILEPATH = '../data/english-french_small/dev.en'
-WRITE_FILEPATH = '../data/processed/english-french_small/dev.en'
-
-REMOVE_STOP_WORDS = True
-REMOVE_CAPITALS = True
-DOWNSIZE_VOCABULARY = True
-VOCABULARY_SIZE = 1000
-UNK_KEYWORD = '<unk>'
+from bsg_parameters import *
 
 
 def get_most_occuring_words(data, num):

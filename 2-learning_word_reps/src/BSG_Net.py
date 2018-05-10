@@ -9,6 +9,8 @@ import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
 
+from utils import one_hot
+
 
 class BSG_Net(nn.Module):
 
@@ -29,7 +31,7 @@ class BSG_Net(nn.Module):
 
         # for BSG prior: we need to 'learn' these
         self.p_mean = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1), requires_grad=True)
-        self.p_sigma = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1))
+        self.p_sigma = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1), requires_grad=True)
 
 
     def forward(self, center_word, context_words):

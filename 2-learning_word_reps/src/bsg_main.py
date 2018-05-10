@@ -7,6 +7,7 @@
 from BSG_Net import BSG_Net
 from preprocess import *
 from utils import *
+from bsg_parameters import *
 
 
 def train_model(model):
@@ -15,13 +16,10 @@ def train_model(model):
 
 if __name__ == '__main__':
 
-    # HYPER PARAMETERS
-    # Note: VOCABULARY_SIZE is imported from preprocess.py. It should be set there
-    EMBEDDING_DIMENSION = 20
-    CONTEXT_SIZE = 3
-
     # load data:
     data = load_data_from_file('../data/processed/english-french_small/dev.en', CONTEXT_SIZE)
+    # create vocabulary
+    create_vocabulary('../data/processed/english-french_small/dev.en')
     # Initialize model
     model = BSG_Net(VOCABULARY_SIZE, EMBEDDING_DIMENSION)
 
