@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@authors: jackharding, akashrajkn
+"""
+
 import os
 
 from collections import Counter

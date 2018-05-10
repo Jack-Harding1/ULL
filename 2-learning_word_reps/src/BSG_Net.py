@@ -1,18 +1,13 @@
-import datetime
-import math
-import os
-import pickle
-import random
-
-import matplotlib.pyplot as plt
-import numpy as np
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@authors: jackharding, akashrajkn
+"""
 
 import torch
 import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-import torchvision
 
 
 class BSG_Net(nn.Module):
@@ -22,7 +17,7 @@ class BSG_Net(nn.Module):
 
         self.embedding_dimension = embedding_dimension
         # Initialize epsilon here to speed it up
-        self.epsilon = distb.MultivariateNormal(torch.zeros(embedding_dimension), torch.eye(embedding_dimension))
+        self.epsilon = distributions.MultivariateNormal(torch.zeros(embedding_dimension), torch.eye(embedding_dimension))
 
         # inference network
         self.fc1 = nn.Linear(vocabulary_size, embedding_dimension, bias=True)  # word embedding. TODO: use a different dimension?

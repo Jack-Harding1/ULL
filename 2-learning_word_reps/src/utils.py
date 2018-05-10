@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@authors: jackharding, akashrajkn
+"""
+
 def _load_data(data, context_size):
     '''
     converts data into required format
