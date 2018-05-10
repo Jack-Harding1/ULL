@@ -1,4 +1,8 @@
-import os
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+@authors: jackharding, akashrajkn
+"""
 
 from BSG_Net import BSG_Net
 from preprocess import *
