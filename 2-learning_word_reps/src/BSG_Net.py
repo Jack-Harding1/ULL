@@ -45,17 +45,8 @@ class BSG_Net(nn.Module):
         for i, context_word in enumerate(context_words):
             context_word_embedding = self.fc1(one_hot(context_word))
 
-            concatenated = torch.cat([center_word, context_word], dim=0)
+            concatenated = torch.cat([context_word_embedding, center_word_embedding], dim=0)
             context_representation += F.relu(self.fc2(concatenated))
-
-        ## Deprecated
-        # for pair in x:
-        #     center_word = self.fc1(onehot(pair[0]))
-        #     context_word = self.fc1(onehot(pair[1]))
-        #
-        #     concatenated = torch.cat([center_word, context_word], dim=0)
-        #     concatenated = F.relu(self.fc2(concatenated))
-        #     context_representation += concatenated
 
         mu = self.fc3(context_representation)
         sigma = F.softplus(self.fc4(context_representation))
@@ -65,8 +56,8 @@ class BSG_Net(nn.Module):
 
         approximated = F.softmax(self.re1(z), dim=0)
 
-        p_mean = torch.matmul(self.p_mean, center_word)
-        p_sigma = F.softplus(torch.matmul(self.p_sigma, center_word))
+        p_mean = torch.matmul(self.p_mean, center_word_embedding)
+        p_sigma = F.softplus(torch.matmul(self.p_sigma, center_word_embedding))
         p_sigma = prior_sigma ** 2
 
         return approximated, mu, sigma, p_mean, p_sigma
