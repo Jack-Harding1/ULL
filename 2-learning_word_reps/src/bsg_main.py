@@ -5,6 +5,7 @@
 """
 
 import torch
+import torch.distributions as distributions
 import torch.optim as optim
 
 from BSG_Net import BSG_Net
@@ -17,7 +18,13 @@ def divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2):
     '''
     Closed form of the KL divergence
     '''
-    return -0.5 + torch.log(sigma_2 / sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))
+
+    # print(torch.log(sigma_2) - torch.log(sigma_1))
+    # print((mu_1 - mu_2) ** 2)
+    # print((sigma_2 ** 2))
+    # print(sigma_1 ** 2)
+
+    return -0.5 + torch.log(sigma_2) - torch.log(sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))
 
 def elbo(approximated, mu_1, sigma_1, mu_2, sigma_2, words_pair):
     '''
@@ -26,7 +33,14 @@ def elbo(approximated, mu_1, sigma_1, mu_2, sigma_2, words_pair):
     center_word = words_pair[0]
     context_words = words_pair[1]
 
+    # print('mu_1: ', mu_1.shape)
+    # print('sigma_1: ', sigma_1.shape)
+    # print('mu_2: ', mu_2.shape)
+    # print('sigma_2', sigma_2.shape)
+
+
     kl_term = divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2)
+
 
     other_term = 0
     for i, context_word in enumerate(context_words):
@@ -53,9 +67,11 @@ def train_model(model, data):
             approximated, mu, sigma, p_mean, p_sigma = model(x[0], x[1])
 
             loss = elbo(approximated, mu, sigma, p_mean, p_sigma, x)
-
-            loss.backward()
-            print(loss)
+            # print("-------------")
+            print(loss.mean())
+            print("-------------")
+            loss.mean().backward()
+            # print(loss)
             optimizer.step()
 
 
