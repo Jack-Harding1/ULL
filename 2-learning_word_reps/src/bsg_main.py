@@ -55,8 +55,9 @@ def elbo(categorical, mu_1, sigma_1, mu_2, sigma_2, words_pair):
     
     likelihood_term = 0
 
-    for i, context_word in enumerate(context_words):
-        likelihood_term += torch.log(categorical[i])
+    for context_word in context_words:
+        context_word_idx = global_w2i[context_word]
+        likelihood_term += torch.log(categorical[context_word_idx])
 
     return kl_term - likelihood_term
 
