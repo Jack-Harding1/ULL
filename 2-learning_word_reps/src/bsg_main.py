@@ -18,15 +18,27 @@ def divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2):
     '''
     Closed form of the KL divergence
     '''
-
+    
+#    print(mu_1)
+#    print(mu_2)
+#    
+#    print(sigma_1)
+#    print(sigma_2)
     # print(torch.log(sigma_2) - torch.log(sigma_1))
     # print((mu_1 - mu_2) ** 2)
     # print((sigma_2 ** 2))
     # print(sigma_1 ** 2)
 
-    return -0.5 + torch.log(sigma_2) - torch.log(sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))
+    
+    posterior = distributions.MultivariateNormal(mu_1, torch.diag(sigma_1 ** 2))
+    prior = distributions.MultivariateNormal(mu_2, torch.diag(sigma_2 **2))
+    kl_z = torch.distributions.kl.kl_divergence(posterior, prior)
 
-def elbo(approximated, mu_1, sigma_1, mu_2, sigma_2, words_pair):
+    #kl_z = (-0.5 + torch.log(sigma_2) - torch.log(sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))).sum()
+
+    return kl_z
+
+def elbo(categorical, mu_1, sigma_1, mu_2, sigma_2, words_pair):
     '''
     Loss function
     '''
@@ -39,14 +51,14 @@ def elbo(approximated, mu_1, sigma_1, mu_2, sigma_2, words_pair):
     # print('sigma_2', sigma_2.shape)
 
 
-    kl_term = divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2)
+    kl_term = divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2) * len(context_words)
+    
+    likelihood_term = 0
 
-
-    other_term = 0
     for i, context_word in enumerate(context_words):
-        other_term += torch.log(approximated[i])
+        likelihood_term += torch.log(categorical[i])
 
-    return (other_term - kl_term)
+    return kl_term - likelihood_term
 
 
 def train_model(model, data):
@@ -57,9 +69,8 @@ def train_model(model, data):
 
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-    losses = []
-
     for epoch in range(EPOCHS):
+        losses = []
         print('Epoch number: ', epoch)
 
         for x in data:
@@ -67,13 +78,13 @@ def train_model(model, data):
             approximated, mu, sigma, p_mean, p_sigma = model(x[0], x[1])
 
             loss = elbo(approximated, mu, sigma, p_mean, p_sigma, x)
-            # print("-------------")
-            print(loss.mean())
-            print("-------------")
-            loss.mean().backward()
-            # print(loss)
+#            print("-------------")
+#            print(loss.item())
+#            print("-------------")
+            loss.backward()
+            losses.append(loss.item())
             optimizer.step()
-
+        print("AVERAGE LOSS", (sum(losses) / len(losses)))
 
 if __name__ == '__main__':
 
@@ -84,6 +95,6 @@ if __name__ == '__main__':
     # Initialize model
     model = BSG_Net(VOCABULARY_SIZE, EMBEDDING_DIMENSION)
 
-    # print(model.parameters())
+    #print(model.parameters().data)
 
     train_model(model, data)

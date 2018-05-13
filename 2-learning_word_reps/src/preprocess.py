@@ -35,7 +35,7 @@ def downsize_vocabulary(data):
       @return processed_data
     '''
 
-    most_occuring = get_most_occuring_words(data, VOCABULARY_SIZE)
+    most_occuring = get_most_occuring_words(data, VOCABULARY_SIZE - 1)
 
     processed_data = []
     for sentence in data:

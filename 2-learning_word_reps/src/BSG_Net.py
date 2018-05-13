@@ -27,14 +27,15 @@ class BSG_Net(nn.Module):
         self.fc2 = nn.Linear(embedding_dimension * 2, embedding_dimension * 2, bias=True)
         self.fc3 = nn.Linear(embedding_dimension * 2, embedding_dimension, bias=True)
         self.fc4 = nn.Linear(embedding_dimension * 2, embedding_dimension, bias=True)
-        # for reparameterization
+        
+        #to obtain categorical distribution from reparameterized sample
         self.re1 = nn.Linear(embedding_dimension, vocabulary_size, bias=True)
 
         # for BSG prior: we need to 'learn' these: X
         # self.p_mean = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1), requires_grad=True)
         # self.p_sigma = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1), requires_grad=True)
-        self.p_mean = nn.Embedding(vocabulary_size, embedding_dimension)
-        self.p_sigma = nn.Embedding(vocabulary_size, embedding_dimension)
+        self.p_mean = nn.Linear(vocabulary_size, embedding_dimension)
+        self.p_sigma = nn.Linear(vocabulary_size, embedding_dimension)
 
     def forward(self, center_word, context_words):
         '''
@@ -50,14 +51,14 @@ class BSG_Net(nn.Module):
 
             concatenated = torch.cat([context_word_embedding, center_word_embedding], dim=0)
             context_representation += F.relu(self.fc2(concatenated))
-
+            
         mu = self.fc3(context_representation)
         sigma = F.softplus(self.fc4(context_representation))
-        sigma = sigma ** 2
+        epsilon_noise = self.epsilon.sample()
+        
         # Kingma-Welling trick
-        z = mu + self.epsilon.sample() * sigma
-
-        approximated = F.softmax(self.re1(z), dim=0)
+        reparameterized_sample = mu + (epsilon_noise * (sigma ** 2))
+        categorical_distribution = F.softmax(self.re1(reparameterized_sample), dim=0)
 
         # print("center_word_embedding: ", center_word_embedding.shape)
         # print("p_mean: ", self.p_mean.shape)
@@ -67,7 +68,11 @@ class BSG_Net(nn.Module):
         # p_sigma = p_sigma ** 2
 
         # sadly there is no direct conversion from float to long tensor :/
-        p_mean = self.p_mean(torch.LongTensor(np.array(center_word_1hot)))
-        p_sigma = F.softplus(self.p_sigma(torch.LongTensor(np.array(center_word_1hot))))
+        #p_mean = self.p_mean(torch.LongTensor(np.array(center_word_1hot)))
+        #p_sigma = F.softplus(self.p_sigma(torch.LongTensor(np.array(center_word_1hot))))
+        
+        p_mean = self.p_mean(center_word_1hot)
+        p_sigma = F.softplus(self.p_sigma(center_word_1hot))
+        
 
-        return approximated, mu, sigma, p_mean, p_sigma
+        return categorical_distribution, mu, sigma, p_mean, p_sigma
