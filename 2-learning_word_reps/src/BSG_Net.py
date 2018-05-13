@@ -34,8 +34,8 @@ class BSG_Net(nn.Module):
         # for BSG prior: we need to 'learn' these: X
         # self.p_mean = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1), requires_grad=True)
         # self.p_sigma = nn.Parameter(torch.empty(embedding_dimension, vocabulary_size).uniform_(-1, 1), requires_grad=True)
-        self.p_mean = nn.Linear(vocabulary_size, embedding_dimension)
-        self.p_sigma = nn.Linear(vocabulary_size, embedding_dimension)
+        self.p_mean = nn.Linear(vocabulary_size, embedding_dimension, bias = True)
+        self.p_sigma = nn.Linear(vocabulary_size, embedding_dimension, bias = True)
 
     def forward(self, center_word, context_words):
         '''
@@ -54,10 +54,10 @@ class BSG_Net(nn.Module):
             
         mu = self.fc3(context_representation)
         sigma = F.softplus(self.fc4(context_representation))
-        epsilon_noise = self.epsilon.sample()
         
         # Kingma-Welling trick
-        reparameterized_sample = mu + (epsilon_noise * (sigma ** 2))
+        epsilon_noise = self.epsilon.sample()
+        reparameterized_sample = mu + (epsilon_noise * sigma)
         categorical_distribution = F.softmax(self.re1(reparameterized_sample), dim=0)
 
         # print("center_word_embedding: ", center_word_embedding.shape)
