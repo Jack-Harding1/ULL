@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from utils import one_hot
+from torch.autograd import Variable
 
 
 class BSG_Net(nn.Module):
@@ -43,8 +44,8 @@ class BSG_Net(nn.Module):
               Currently we are repeating center_word for each of the context_words
         '''
         center_word_1hot = one_hot(center_word)
-        context_representation = torch.zeros(self.embedding_dimension * 2)
-        center_word_embedding = self.fc1(center_word_1hot)
+        context_representation = Variable(torch.zeros(self.embedding_dimension * 2))
+        center_word_embedding = Variable(self.fc1(center_word_1hot))
 
         for i, context_word in enumerate(context_words):
             context_word_embedding = self.fc1(one_hot(context_word))

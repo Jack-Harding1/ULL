@@ -125,6 +125,5 @@ def make_batches(data, batch_size):
     print(num_samples)
     for idx in range(num_samples // batch_size):
         batch = data[(idx)*batch_size : (idx+1)*batch_size]
-        new_data.append(batch)
-    
+        new_data.append(batch) 
     return new_data

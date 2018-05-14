@@ -71,9 +71,9 @@ def train_model(model, data):
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
     for epoch in range(EPOCHS):
-        losses = []
+        i = 0
         print('Epoch number: ', epoch)
-
+        losses = []
         for x in data:
             optimizer.zero_grad()
             approximated, mu, sigma, p_mean, p_sigma = model(x[0], x[1])
@@ -85,15 +85,20 @@ def train_model(model, data):
             loss.backward()
             losses.append(loss.item())
             optimizer.step()
-        print("AVERAGE LOSS", (sum(losses) / len(losses)))
+        print("AVERAGE LOSS IN REGION {} was {}".format(i, sum(losses)/len(losses)))
 
 if __name__ == '__main__':
 
     # load data:
     data = load_data_from_file('../data/processed/english-french_small/dev.en', CONTEXT_SIZE)
-    # create vocabulary
+    #create vocabulary
     create_vocabulary('../data/processed/english-french_small/dev.en')
-    # Initialize model
+    
+    # load data:
+#    data = load_data_from_file('../data/processed/english-french_large/training.en', CONTEXT_SIZE)
+#    # create vocabulary
+#    create_vocabulary('../data/processed/english-french_large/training.en')
+#    # Initialize model
     model = BSG_Net(VOCABULARY_SIZE, EMBEDDING_DIMENSION)
 
     #print(model.parameters().data)

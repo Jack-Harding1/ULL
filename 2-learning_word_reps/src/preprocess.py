@@ -10,7 +10,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 from time import sleep
 
-from bsg_parameters import *
+from Skipgram_Parameters import *
 
 
 def get_most_occuring_words(data, num):
@@ -110,6 +110,9 @@ if __name__ == '__main__':
     if not os.path.exists('../data/processed/english-french_small'):
         os.makedirs('../data/processed/english-french_small')
         sleep(0.5)
+#    if not os.path.exists('../data/processed/english-french_large'):
+#        os.makedirs('../data/processed/english-french_large')
+#        sleep(0.5)
 
     data = '\n'.join(data)
 
