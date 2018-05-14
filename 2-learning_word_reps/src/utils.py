@@ -5,8 +5,9 @@
 """
 
 import torch
+import numpy as np
 
-from bsg_parameters import *
+from Skipgram_Parameters import *
 
 
 # TODO: I don't like global variables: Probably create a class to do all vocabulary stuff?
@@ -74,6 +75,31 @@ def _load_data(data, context_size):
 
     return X
 
+def _load_skipgram_data(data, context_size):
+    '''
+    converts data into required format
+
+    @param: data (list of sentences)
+    @param: context_size
+    @return: [(center_word, [context_words]), (center_word, [context_words]), ...]
+    '''
+    X = []
+    for sentence in data:
+        words = sentence.split()
+        if len(words) == 1:  # ignore sentences of length 1.
+            continue
+
+        for idx, word in enumerate(words):
+            center_word = word
+
+            context_words = []
+            for j in range(max(0, idx - context_size), min(len(words), idx + context_size + 1)):
+                if j == idx:  # center_word is included in this range, ignore that
+                    continue
+                X.append((center_word, words[j]))
+
+    return X
+
 def load_data_from_file(filepath, context_size):
     '''
     loads data from filepath and converts it into required format
@@ -82,3 +108,23 @@ def load_data_from_file(filepath, context_size):
         data = f.read().splitlines()
 
     return _load_data(data, context_size)
+
+def load_skipgram_data_from_file(filepath, context_size):
+    '''
+    loads skipgram data from filepath and converts it into required format
+    '''
+    with open(filepath, 'r') as f:
+        data = f.read().splitlines()
+
+    return _load_skipgram_data(data, context_size)
+
+def make_batches(data, batch_size):
+
+    new_data = []
+    num_samples = len(data)
+    print(num_samples)
+    for idx in range(num_samples // batch_size):
+        batch = data[(idx)*batch_size : (idx+1)*batch_size]
+        new_data.append(batch)
+    
+    return new_data
