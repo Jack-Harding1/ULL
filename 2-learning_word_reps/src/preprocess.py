@@ -10,7 +10,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 from time import sleep
 
-from Skipgram_Parameters import *
+from embed_align_parameters import *
 
 
 def get_most_occuring_words(data, num):
@@ -91,11 +91,11 @@ def convert_to_lowercase(data):
 
 if __name__ == '__main__':
     # Read data
-    with open(READ_FILEPATH, 'r') as f:
+    with open(READ_FILEPATH[1], 'r') as f:
         data = f.read().splitlines()
 
-    if REMOVE_STOP_WORDS:
-        data = remove_stop_words_and_punctuation(data)
+#    if REMOVE_STOP_WORDS:
+#        data = remove_stop_words_and_punctuation(data)
 
     if REMOVE_CAPITALS:
         data = convert_to_lowercase(data)
@@ -104,11 +104,11 @@ if __name__ == '__main__':
         data = downsize_vocabulary(data)
 
     # Save data
-    if not os.path.exists('../data/processed'):
-        os.makedirs('../data/processed')
+    if not os.path.exists('../data/processed/embed_align'):
+        os.makedirs('../data/processed/embed_align')
         sleep(0.5)
-    if not os.path.exists('../data/processed/english-french_small'):
-        os.makedirs('../data/processed/english-french_small')
+    if not os.path.exists('../data/processed/embed_align/english-french_small'):
+        os.makedirs('../data/processed/embed_align/english-french_small')
         sleep(0.5)
 #    if not os.path.exists('../data/processed/english-french_large'):
 #        os.makedirs('../data/processed/english-french_large')
@@ -116,5 +116,5 @@ if __name__ == '__main__':
 
     data = '\n'.join(data)
 
-    with open(WRITE_FILEPATH, 'w+') as f:
+    with open(WRITE_FILEPATH[1], 'w+') as f:
         f.write(data)
