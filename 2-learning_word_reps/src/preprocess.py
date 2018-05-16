@@ -105,7 +105,7 @@ def convert_to_lowercase(data):
 
 if __name__ == '__main__':
     # Read data
-    with open('../data/english-french_large/training.en', 'r') as f:
+    with open(READ_FILEPATH, 'r') as f:
         data = f.read().splitlines()
 
     lst_gold = process_lst_gold_file()
@@ -131,11 +131,8 @@ if __name__ == '__main__':
     if not os.path.exists('../data/processed/english-french_large'):
         os.makedirs('../data/processed/english-french_large')
         sleep(0.5)
-#    if not os.path.exists('../data/processed/english-french_large'):
-#        os.makedirs('../data/processed/english-french_large')
-#        sleep(0.5)
 
     data = '\n'.join(data)
 
-    with open('../data/processed/english-french_large/training.en', 'w+') as f:
+    with open(WRITE_FILEPATH, 'w+') as f:
         f.write(data)
