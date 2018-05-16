@@ -90,7 +90,9 @@ def one_hot(word):
     @param vocab_size: vocabulary size
     @return one-hot pytorch vector
     '''
-    onehot = torch.zeros(VOCABULARY_SIZE)
+    v_size = len(global_w2i.keys())
+
+    onehot = torch.zeros(v_size)
     onehot[global_w2i[word]] = 1.0
 
     return onehot
@@ -218,5 +220,30 @@ def make_batches(data, batch_size):
     print(num_samples)
     for idx in range(num_samples // batch_size):
         batch = data[(idx)*batch_size : (idx+1)*batch_size]
-        new_data.append(batch) 
+        new_data.append(batch)
     return new_data
+
+def process_lst_gold_file():
+    '''
+    Creates a dictionary of word and its nearest words.
+    NOTE: We are ignoring phrases
+    '''
+
+    with open('../data/lexical_substitution/lst.gold.candidates', 'r') as f:
+        data = f.read().splitlines()
+
+    output = {}
+
+    for line in data:
+        diff = line.split('::')
+        center_word = diff[0].split('.')[0]
+        context_words = diff[1].split(';')
+        final = []
+        for w in context_words:
+            w_s = w.split(' ')
+            if len(w_s) == 1:
+                final.append(w)
+
+        output[center_word] = final
+
+    return output

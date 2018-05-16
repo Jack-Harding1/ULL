@@ -10,7 +10,8 @@ from collections import Counter
 from nltk.corpus import stopwords
 from time import sleep
 
-from embed_align_parameters import *
+from bsg_parameters import *
+from utils import process_lst_gold_file
 
 
 def get_most_occuring_words(data, num):
@@ -28,7 +29,7 @@ def get_most_occuring_words(data, num):
 
     return [x[0] for x in y]
 
-def downsize_vocabulary(data):
+def downsize_vocabulary(data, lst_words=None):
     '''
     Decrease the vocabulary size.
       @param data: list of strings. Each string is a sentence
@@ -36,6 +37,14 @@ def downsize_vocabulary(data):
     '''
 
     most_occuring = get_most_occuring_words(data, VOCABULARY_SIZE - 1)
+
+    if lst_words is not None:
+        idx = len(most_occuring) - 1
+        for w in lst_words:
+            if w not in most_occuring:
+                # print(idx)
+                most_occuring[idx] = w
+                idx -= 1
 
     processed_data = []
     for sentence in data:
@@ -53,7 +62,7 @@ def downsize_vocabulary(data):
 
     return processed_data
 
-def remove_stop_words_and_punctuation(data):
+def remove_stop_words_and_punctuation(data, lst_words=None):
     '''
     Remove nltk stop words.
     Remove only punctuation marks that are not associated with words.
@@ -63,6 +72,11 @@ def remove_stop_words_and_punctuation(data):
     '''
     stop_words = list(stopwords.words('english'))
     to_remove = ['.', ',', ':', ';', '$', '?']
+
+    if lst_words is not None:
+        for w in lst_words:
+            if w in stop_words:
+                stop_words.remove(w)
 
     processed_data = []
     for sentence in data:
@@ -91,24 +105,31 @@ def convert_to_lowercase(data):
 
 if __name__ == '__main__':
     # Read data
-    with open(READ_FILEPATH[1], 'r') as f:
+    with open('../data/english-french_large/training.en', 'r') as f:
         data = f.read().splitlines()
 
-#    if REMOVE_STOP_WORDS:
-#        data = remove_stop_words_and_punctuation(data)
+    lst_gold = process_lst_gold_file()
+    lst_words = []
+    for w in lst_gold.keys():
+        lst_words.append(w)
+        lst_words += lst_gold[w]
+    lst_words = set(lst_words)
+
+    if REMOVE_STOP_WORDS:
+        data = remove_stop_words_and_punctuation(data)
 
     if REMOVE_CAPITALS:
         data = convert_to_lowercase(data)
 
     if DOWNSIZE_VOCABULARY:
-        data = downsize_vocabulary(data)
+        data = downsize_vocabulary(data, lst_words)
 
     # Save data
-    if not os.path.exists('../data/processed/embed_align'):
-        os.makedirs('../data/processed/embed_align')
+    if not os.path.exists('../data/processed'):
+        os.makedirs('../data/processed')
         sleep(0.5)
-    if not os.path.exists('../data/processed/embed_align/english-french_small'):
-        os.makedirs('../data/processed/embed_align/english-french_small')
+    if not os.path.exists('../data/processed/english-french_large'):
+        os.makedirs('../data/processed/english-french_large')
         sleep(0.5)
 #    if not os.path.exists('../data/processed/english-french_large'):
 #        os.makedirs('../data/processed/english-french_large')
@@ -116,5 +137,5 @@ if __name__ == '__main__':
 
     data = '\n'.join(data)
 
-    with open(WRITE_FILEPATH[1], 'w+') as f:
+    with open('../data/processed/english-french_large/training.en', 'w+') as f:
         f.write(data)
