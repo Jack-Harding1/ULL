@@ -35,6 +35,14 @@ class BSG_Net(nn.Module):
         self.p_mean = nn.Linear(vocabulary_size, embedding_dimension, bias = True)
         self.p_sigma = nn.Linear(vocabulary_size, embedding_dimension, bias = True)
 
+        self.fc1 = self.fc1.cuda()
+        self.fc2 = self.fc2.cuda()
+        self.fc3 = self.fc3.cuda()
+        self.fc4 = self.fc4.cuda()
+        self.re1 = self.re1.cuda()
+        self.p_mean = self.p_mean.cuda()
+        self.p_sigma = self.p_sigma.cuda()
+
     def forward(self, center_word, context_words):
         '''
         TODO: Each data point 'x' is { center_word: [context_words] }
@@ -43,7 +51,7 @@ class BSG_Net(nn.Module):
         center_word_1hot = one_hot(center_word)
         center_word_embedding = self.fc1(center_word_1hot)
 
-        context_representation = torch.zeros(self.embedding_dimension * 2)
+        context_representation = torch.zeros(self.embedding_dimension * 2).cuda()
 
         for i, context_word in enumerate(context_words):
             context_word_embedding = self.fc1(one_hot(context_word))
@@ -55,10 +63,10 @@ class BSG_Net(nn.Module):
         sigma = F.softplus(self.fc4(context_representation))
 
         # Kingma-Welling trick
-        epsilon_noise = self.epsilon.sample()
+        epsilon_noise = self.epsilon.sample().cuda()
         reparameterized_sample = mu + (epsilon_noise * sigma)
         # categorical_distribution = F.softmax(self.re1(reparameterized_sample), dim=0)
-        categorical_distribution = F.log_softmax(self.re1(reparameterized_sample), dim=0)
+        categorical_distribution = F.softmax(self.re1(reparameterized_sample), dim=0)
 
         p_mean = self.p_mean(center_word_1hot)
         p_sigma = F.softplus(self.p_sigma(center_word_1hot))

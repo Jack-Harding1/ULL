@@ -5,6 +5,7 @@
 """
 
 import os
+import random
 
 from collections import Counter
 from nltk.corpus import stopwords
@@ -25,6 +26,14 @@ def get_most_occuring_words(data, num):
     for sentence in data:
         words = sentence.split()
         all_words += words
+
+    unique = list(set(all_words))
+
+    # if len(unique) < num:
+    #     y = Counter(all_words).most_common(num)
+
+    print("vocab: {}, most: {}".format(str(len(unique)), str(num)))
+
     y = Counter(all_words).most_common(num)
 
     return [x[0] for x in y]
@@ -38,13 +47,21 @@ def downsize_vocabulary(data, lst_words=None):
 
     most_occuring = get_most_occuring_words(data, VOCABULARY_SIZE - 1)
 
+    print('lst_words: {}'.format(len(list(set(lst_words)))))
+
     if lst_words is not None:
-        idx = len(most_occuring) - 1
-        for w in lst_words:
-            if w not in most_occuring:
-                # print(idx)
-                most_occuring[idx] = w
-                idx -= 1
+        most_occuring = list(set(lst_words)) + list(set(most_occuring))
+        most_occuring = list(set(most_occuring))
+        # most_occuring = most_occuring[:VOCABULARY_SIZE - 1]
+        print('final: {}'.format(len(most_occuring)))
+
+    # if lst_words is not None:
+    #     idx = len(most_occuring) - 1
+    #     for w in lst_words:
+    #         if w not in most_occuring:
+    #             # print(idx)
+    #             most_occuring[idx] = w
+    #             idx -= 1
 
     processed_data = []
     for sentence in data:
@@ -115,6 +132,15 @@ if __name__ == '__main__':
         lst_words += lst_gold[w]
     lst_words = set(lst_words)
 
+    if DOWNSAMPLE_DATA > 0:
+        samples = random.sample(range(len(data)), DOWNSAMPLE_DATA)
+        data = [data[x] for x in samples]
+
+        # save this dataset for further use
+        save_data = '\n'.join(data)
+        with open('../data/english-french_large/training-{}.en'.format(str(DOWNSAMPLE_DATA)), 'w+') as f:
+            f.write(save_data)
+
     if REMOVE_STOP_WORDS:
         data = remove_stop_words_and_punctuation(data)
 
@@ -133,6 +159,6 @@ if __name__ == '__main__':
         sleep(0.5)
 
     data = '\n'.join(data)
-
-    with open(WRITE_FILEPATH, 'w+') as f:
+    save_path = '../data/processed/english-french_large/training-{}.en'.format(str(DOWNSAMPLE_DATA))
+    with open(save_path, 'w+') as f:
         f.write(data)
