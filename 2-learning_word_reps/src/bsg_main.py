@@ -3,6 +3,8 @@
 """
 @authors: jackharding, akashrajkn
 """
+import pickle
+import time
 
 import torch
 import torch.distributions as distributions
@@ -19,7 +21,7 @@ def divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2):
     Closed form of the KL divergence
     '''
     posterior = distributions.MultivariateNormal(mu_1, torch.diag(sigma_1 ** 2))
-    prior = distributions.MultivariateNormal(mu_2, torch.diag(sigma_2 **2))
+    prior = distributions.MultivariateNormal(mu_2, torch.diag(sigma_2 ** 2))
     kl_z = torch.distributions.kl.kl_divergence(posterior, prior)
 
     #kl_z = (-0.5 + torch.log(sigma_2) - torch.log(sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))).sum()
@@ -47,24 +49,34 @@ def train_model(model, data):
     # for BSG prior: we need to 'learn' these
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
+    print('- Start training')
+    previous_loss = 0
     for epoch in range(EPOCHS):
-        # print('Epoch number: ', epoch)
-        losses = []
+        current_loss = 0
+        start_time = time.time()
         for x in data:
             optimizer.zero_grad()
             approximated, mu, sigma, p_mean, p_sigma = model(x[0], x[1])
-
             loss = elbo(approximated, mu, sigma, p_mean, p_sigma, x)
-
             loss.backward()
-            losses.append(loss.item())
+            current_loss += loss.item()
             optimizer.step()
-        print("AVERAGE LOSS IN REGION {} was {}".format(epoch, sum(losses)/len(losses)))
+            break
+        break
 
+        elapsed_time = time.time() - start_time
+        print("   - AVERAGE LOSS IN EPOCH {} was {}".format(epoch, current_loss/len(data)))
+        print("     Time taken: {}".format(str(elapsed_time)))
+
+        if abs(previous_loss - current_loss) < THRESHOLD:
+            break
+        previous_loss = current_loss
 
 def save_model(model, vocab_size, interrupted=False):
-
-    filename = '../models/bsg.e-{}.v-{}'.format(str(EPOCHS), str(vocab_size))
+    '''
+    Save trained model. Interrupted models are appended with "-interrupted" key
+    '''
+    filename = '../models/bsg-{}_ed-{}'.format(str(DOWNSAMPLE_DATA), str(EMBEDDING_DIMENSION))
 
     if interrupted:
         filename += '-interrupted'
@@ -80,20 +92,34 @@ def load_model(filepath):
 
 
 if __name__ == '__main__':
+    print('MODEL, training-set: {}, embedding_dimension: {}'.format(str(DOWNSAMPLE_DATA), str(EMBEDDING_DIMENSION)))
     interrupt = False
     # load data:
-    data = load_data_from_file('../data/processed/english-french_large/training.en', CONTEXT_SIZE)
+    filepath = '../data/processed/english-french_large/training-{}.en'.format(DOWNSAMPLE_DATA)
+    # data = load_data_from_file(filepath, CONTEXT_SIZE)
 
-    create_vocabulary('../data/processed/english-french_large/training.en')
+    # create_vocabulary(filepath)
+    print('- Created Vocabulary')
+    # v_size = len(global_w2i.keys())
+    # model = BSG_Net(v_size, EMBEDDING_DIMENSION)
 
-    v_size = len(global_w2i.keys())
-    model = BSG_Net(v_size, EMBEDDING_DIMENSION)
+    model = BSG_Net(10,20)
 
-    try:
-        train_model(model, data)
-    except KeyboardInterrupt:
-        save_model(model, v_size, interrupted=True)
-        interrupt = True
+    # print(len(list(model.parameters())))
 
-    if not interrupt:
-        save_model(model, v_size)
+    a = model.fc1.weights()
+
+    # print('- Initalized model')
+    #
+    # try:
+    #     train_model(model, data)
+    #     print('- Model Trained')
+    # except KeyboardInterrupt:
+    #     print('- Process interrupted')
+    #     # save_model(model, v_size, interrupted=True)
+    #     interrupt = True
+    #
+    # # if not interrupt:
+    #     # save_model(model, v_size)
+    #
+    # print('- Model saved')
