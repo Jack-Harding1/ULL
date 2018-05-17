@@ -10,27 +10,41 @@ import torch
 import torch.distributions as distributions
 import torch.optim as optim
 
-from BSG_Net import BSG_Net
+from BayesianSkipGram import *
 from preprocess import *
 from utils import *
-from bsg_parameters import *
+from BayesianSkipGram_parameters import *
 
 
 def divergence_closed_form(mu_1, sigma_1, mu_2, sigma_2):
     '''
-    Closed form of the KL divergence
+    Computes the KL divergence between two Gaussians
+    @param mu_1
+    @param sigma_1
+    @param mu_2
+    @param sigma_2
+
+    @return kl_z: KL divergence
     '''
     posterior = distributions.MultivariateNormal(mu_1, torch.diag(sigma_1 ** 2))
     prior = distributions.MultivariateNormal(mu_2, torch.diag(sigma_2 ** 2))
     kl_z = torch.distributions.kl.kl_divergence(posterior, prior)
 
-    #kl_z = (-0.5 + torch.log(sigma_2) - torch.log(sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))).sum()
-
+    # kl_z = (-0.5 + torch.log(sigma_2) - torch.log(sigma_1) + (0.5 * (sigma_1 ** 2 + (mu_1 - mu_2) ** 2) / (sigma_2 ** 2))).sum()
     return kl_z
 
 def elbo(categorical, mu_1, sigma_1, mu_2, sigma_2, words_pair):
     '''
     Loss function
+
+    @param categorical: predicted
+    @param mu_1
+    @param sigma_1
+    @param mu_2
+    @param sigma_2
+    @param words_pair: input (center_word, context_words) pair for forward pass
+
+    @return negative elbo
     '''
     center_word = words_pair[0]
     context_words = words_pair[1]
@@ -61,8 +75,6 @@ def train_model(model, data):
             loss.backward()
             current_loss += loss.item()
             optimizer.step()
-            break
-        break
 
         elapsed_time = time.time() - start_time
         print("   - AVERAGE LOSS IN EPOCH {} was {}".format(epoch, current_loss/len(data)))
@@ -75,6 +87,9 @@ def train_model(model, data):
 def save_model(model, vocab_size, interrupted=False):
     '''
     Save trained model. Interrupted models are appended with "-interrupted" key
+    @param model: model to be saved
+    @param vocab_size
+    @param interrupted: If interrupted from Keyboard (Crtl + C)
     '''
     filename = '../models/bsg-{}_ed-{}'.format(str(DOWNSAMPLE_DATA), str(EMBEDDING_DIMENSION))
 
@@ -92,34 +107,30 @@ def load_model(filepath):
 
 
 if __name__ == '__main__':
+
     print('MODEL, training-set: {}, embedding_dimension: {}'.format(str(DOWNSAMPLE_DATA), str(EMBEDDING_DIMENSION)))
+
     interrupt = False
     # load data:
     filepath = '../data/processed/english-french_large/training-{}.en'.format(DOWNSAMPLE_DATA)
-    # data = load_data_from_file(filepath, CONTEXT_SIZE)
+    data = load_data_from_file(filepath, CONTEXT_SIZE)
 
-    # create_vocabulary(filepath)
+    create_vocabulary(filepath)
     print('- Created Vocabulary')
-    # v_size = len(global_w2i.keys())
-    # model = BSG_Net(v_size, EMBEDDING_DIMENSION)
+    v_size = len(global_w2i.keys())
+    # Initialize model
+    model = BayesianSkipGram(v_size, EMBEDDING_DIMENSION)
 
-    model = BSG_Net(10,20)
+    print('- Initalized model')
 
-    # print(len(list(model.parameters())))
+    try:
+        train_model(model, data)
+        print('- Model Trained')
+    except KeyboardInterrupt:
+        print('- Process interrupted')
+        save_model(model, v_size, interrupted=True)
+        interrupt = True
 
-    a = model.fc1.weights()
-
-    # print('- Initalized model')
-    #
-    # try:
-    #     train_model(model, data)
-    #     print('- Model Trained')
-    # except KeyboardInterrupt:
-    #     print('- Process interrupted')
-    #     # save_model(model, v_size, interrupted=True)
-    #     interrupt = True
-    #
-    # # if not interrupt:
-    #     # save_model(model, v_size)
-    #
-    # print('- Model saved')
+    if not interrupt:
+        save_model(model, v_size)
+    print('- Model saved')

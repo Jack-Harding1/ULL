@@ -14,10 +14,10 @@ from utils import one_hot
 from torch.autograd import Variable
 
 
-class BSG_Net(nn.Module):
+class BayesianSkipGram(nn.Module):
 
     def __init__(self, vocabulary_size, embedding_dimension=20):
-        super(BSG_Net, self).__init__()
+        super(BayesianSkipGram, self).__init__()
 
         self.embedding_dimension = embedding_dimension
         # Initialize epsilon here to speed it up
@@ -45,8 +45,9 @@ class BSG_Net(nn.Module):
 
     def forward(self, center_word, context_words):
         '''
-        TODO: Each data point 'x' is { center_word: [context_words] }
-              Currently we are repeating center_word for each of the context_words
+        Forward pass
+        @param center_word
+        @param context_words: list of words
         '''
         center_word_1hot = one_hot(center_word)
         center_word_embedding = self.fc1(center_word_1hot)
@@ -62,10 +63,9 @@ class BSG_Net(nn.Module):
         mu = self.fc3(context_representation)
         sigma = F.softplus(self.fc4(context_representation))
 
-        # Kingma-Welling trick
+        # Kingma-Welling reparameterization trick
         epsilon_noise = self.epsilon.sample().cuda()
         reparameterized_sample = mu + (epsilon_noise * sigma)
-        # categorical_distribution = F.softmax(self.re1(reparameterized_sample), dim=0)
         categorical_distribution = F.softmax(self.re1(reparameterized_sample), dim=0)
 
         p_mean = self.p_mean(center_word_1hot)

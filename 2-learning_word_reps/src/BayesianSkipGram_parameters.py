@@ -4,13 +4,13 @@
 @authors: jackharding, akashrajkn
 """
 
-#FOR DEVELOPMENT
-# READ_FILEPATH = '../data/english-french_small/dev.en'
-# WRITE_FILEPATH = '../data/processed/english-french_small/dev.en'
+# FOR DEVELOPMENT
+READ_FILEPATH = '../data/english-french_small/dev.en'
+WRITE_FILEPATH = '../data/processed/english-french_small/dev.en'
 
-#FOR TRAINING
-READ_FILEPATH = '../data/english-french_large/training.en'
-WRITE_FILEPATH = '../data/processed/english-french_large/training.en'
+# # FOR TRAINING
+# READ_FILEPATH = '../data/english-french_large/training.en'
+# WRITE_FILEPATH = '../data/processed/english-french_large/training.en'
 
 DOWNSAMPLE_DATA = 2000  # if 0, then select all data, else randomly sample 'n' sentences
 REMOVE_STOP_WORDS = True

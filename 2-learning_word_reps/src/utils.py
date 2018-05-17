@@ -7,8 +7,6 @@
 import torch
 import numpy as np
 
-from Embed_Align_parameters import *
-
 
 # TODO: I don't like global variables: Probably create a class to do all vocabulary stuff?
 global_w2i = dict()
@@ -63,7 +61,6 @@ def create_embed_align_vocabulary(filepaths):
         for word in words:
             if word not in vocabulary:
                 vocabulary.append(word)
-
 
     for idx, word in enumerate(vocabulary):
         global_i2w_l1[idx] = word
@@ -205,11 +202,11 @@ def load_embed_align_data_from_file(filepaths, w2i_l1, w2i_l2, batch_size):
     '''
     with open(filepaths[0], 'r') as f:
             data1 = f.read().splitlines()
-            l1_data = _load_embed_align_data(data1, w2i_l1, BATCH_SIZE)
+            l1_data = _load_embed_align_data(data1, w2i_l1, batch_size)
 
     with open(filepaths[1], 'r') as f:
             data2 = f.read().splitlines()
-            l2_data = _load_embed_align_data(data2, w2i_l2, BATCH_SIZE)
+            l2_data = _load_embed_align_data(data2, w2i_l2, batch_size)
 
     return l1_data, l2_data
 

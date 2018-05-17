@@ -11,7 +11,7 @@ from collections import Counter
 from nltk.corpus import stopwords
 from time import sleep
 
-from bsg_parameters import *
+from BayesianSkipGram_parameters import *
 from utils import process_lst_gold_file
 
 
@@ -28,10 +28,6 @@ def get_most_occuring_words(data, num):
         all_words += words
 
     unique = list(set(all_words))
-
-    # if len(unique) < num:
-    #     y = Counter(all_words).most_common(num)
-
     print("vocab: {}, most: {}".format(str(len(unique)), str(num)))
 
     y = Counter(all_words).most_common(num)
@@ -52,16 +48,7 @@ def downsize_vocabulary(data, lst_words=None):
     if lst_words is not None:
         most_occuring = list(set(lst_words)) + list(set(most_occuring))
         most_occuring = list(set(most_occuring))
-        # most_occuring = most_occuring[:VOCABULARY_SIZE - 1]
         print('final: {}'.format(len(most_occuring)))
-
-    # if lst_words is not None:
-    #     idx = len(most_occuring) - 1
-    #     for w in lst_words:
-    #         if w not in most_occuring:
-    #             # print(idx)
-    #             most_occuring[idx] = w
-    #             idx -= 1
 
     processed_data = []
     for sentence in data:
