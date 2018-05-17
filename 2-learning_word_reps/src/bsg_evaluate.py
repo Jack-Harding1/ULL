@@ -67,19 +67,19 @@ def perform_lst(model, gold, test):
             priors[center_full, sentence_id].append((w, prior.item()))
             posteriors[center_full, sentence_id].append((w, posterior.item()))
     # print(skip_count)
-    create_out_file(test, mus, '../results/bsg-300-random-mu_scores.out')
-    create_out_file(test, posteriors, '../results/bsg-300-random-post_scores.out')
-    create_out_file(test, priors, '../results/bsg-300-random-prior_scores.out')
+    create_out_file(test, mus, '../results/bsg-300-mu_scores.out')
+    create_out_file(test, posteriors, '../results/bsg-300-post_scores.out')
+    create_out_file(test, priors, '../results/bsg-300-prior_scores.out')
 
 
 if __name__ == '__main__':
 
     create_vocabulary('../data/processed/english-french_large/training-300.en')
 
-    # with open('../models/bsg-5000.model', 'rb') as f:
-    #     model = pickle.load(f)
+    with open('../models/bsg-300.model', 'rb') as f:
+        model = pickle.load(f)
 
-    model = BSG_Net(len(global_w2i.keys()), 100)
+    # model = BSG_Net(len(global_w2i.keys()), 100)
 
     # TODO: lst_test.preprocessed has a different format :/
     test = process_lst_test_file()

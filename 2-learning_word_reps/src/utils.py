@@ -92,10 +92,19 @@ def one_hot(word):
     '''
     v_size = len(global_w2i.keys())
 
-    onehot = torch.zeros(v_size).cuda()
-    onehot[global_w2i[word]] = 1.0
+    if type(word) == list:
+        final = []
 
-    return onehot
+        for w in word:
+            a = [0] * v_size
+            a[global_w2i[w]] = 1
+            final.append(a)
+        return torch.LongTensor(final)
+
+    onehot = [0] * v_size # torch.zeros(v_size)  #.cuda()
+    onehot[global_w2i[word]] = 1
+
+    return torch.LongTensor(onehot)
 
 def _load_data(data, context_size):
     '''
