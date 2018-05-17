@@ -11,8 +11,8 @@ import torch.optim as optim
 
 from preprocess import *
 from utils import *
-from embed_align_parameters import *
-from Embed_Align_Net import Embed_Align
+from EmbedAlign_parameters import *
+from EmbedAlign import EmbedAlign
 
 
 def train_embed_align(model, l1_data, l2_data):
@@ -31,18 +31,17 @@ def train_embed_align(model, l1_data, l2_data):
             loss = model(batch_en, batch_fr)
             loss.backward()
             optimizer.step()
-            
+
             losses.append(loss.item())
-            
-        print("AVERAGE LOSS IN REGION {} was {}".format(epoch, sum(losses)/len(losses)))
+
+        print("AVERAGE LOSS IN REGION {} was {}".format(epoch, sum(losses) / len(losses)))
 
 if __name__ == '__main__':
     # load data:
-    create_embed_align_vocabulary(WRITE_FILEPATH)
     l1_data, l2_data = load_embed_align_data_from_file(WRITE_FILEPATH, global_w2i_l1, global_w2i_l2, BATCH_SIZE)
-    #create vocabulary
-    
+    # create vocabulary
+    create_embed_align_vocabulary(WRITE_FILEPATH)
     # Initialize model
-    model = Embed_Align(len(global_w2i_l1.keys()), len(global_w2i_l2.keys()), EMBEDDING_DIMENSION, False)
+    model = EmbedAlign(len(global_w2i_l1.keys()), len(global_w2i_l2.keys()), EMBEDDING_DIMENSION, False)
 
     train_embed_align(model, l1_data, l2_data)
