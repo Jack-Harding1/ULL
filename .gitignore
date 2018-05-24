@@ -25,3 +25,8 @@ __pycache__/
 2-learning_word_reps/data/processed/*
 
 2-learning_word_reps/models/*
+
+
+# project 3
+3-evaluating_sentence_reps/models/*
+3-evaluating_sentence_reps/data/*
