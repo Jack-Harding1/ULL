@@ -17,7 +17,7 @@ def read_training_data(filepath=None, lowercase=False):
     if filepath is None:
         filepath = '../data/europarl/europarl-v7.fr-en.en'
 
-    print(' - Start reading data from: {}'.format(filepath))
+    print(' - Reading data from: {}'.format(filepath))
 
     with open(filepath, 'r') as f:
         data = f.read().splitlines()
