@@ -6,7 +6,7 @@ import time
 from preprocess import read_training_data
 
 
-EPOCHS = [5, 10]
+EPOCHS = [30, 50]
 FEATURE_SIZE = [100]
 WINDOW = [3, 5]
 NEGATIVE = [5] # Can be anywhere between 5-20.
@@ -50,7 +50,7 @@ if __name__ == '__main__':
             for window in WINDOW:
                 for epochs in EPOCHS:
 
-                    decorator = 'Negative_{}-Features{}-Window_{}-Epochs_{}'.format(negative, feature_size, window, epochs)
+                    decorator = 'Negative_{}-Features_{}-Window_{}-Epochs_{}'.format(negative, feature_size, window, epochs)
                     if LOWERCASE:
                         decorator += '-lowercase'
 
