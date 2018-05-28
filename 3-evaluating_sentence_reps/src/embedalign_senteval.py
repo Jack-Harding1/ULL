@@ -148,12 +148,14 @@ logging.basicConfig(format='%(asctime)s : %(message)s', level=logging.DEBUG)
 
 if __name__ == "__main__":
 
-    transfer_tasks = ['BigramShift', 'CR', 'Depth', 'MPQA', 'MR', 'MRPC', 'SUBJ', 'SST2', 'STS16', 'SST5',
-                      'SICKEntailment', 'SubjNumber', 'Tense', 'TREC']
+    # transfer_tasks = ['BigramShift', 'CR', 'Depth', 'MPQA', 'MR', 'MRPC', 'SUBJ', 'SST2', 'STS16', 'SST5',
+    #                   'SICKEntailment', 'SubjNumber', 'Tense', 'TREC']
 
-    params_senteval.task_path = '../../SentEval/data/'
-    params_senteval.ckpt_path = './models/ull-practical3-embedalign/model.best.validation.aer.ckpt'
-    params_senteval.tok_path = './models/ull-practical3-embedalign/tokenizer.pickle'
+    transfer_tasks = ['MR', 'CR', 'MPQA', 'SUBJ', 'SST2', 'TREC', 'MRPC', 'SICKEntailment', 'STS14']
+
+    params_senteval.task_path = '../../../SentEval/data/'
+    params_senteval.ckpt_path = '../models/ull-practical3-embedalign/model.best.validation.aer.ckpt'
+    params_senteval.tok_path = '../models/ull-practical3-embedalign/tokenizer.pickle'
     params_senteval.kfold = 10
 
     for rule in ['MEAN', 'SUM']:
