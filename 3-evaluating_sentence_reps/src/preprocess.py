@@ -53,8 +53,6 @@ def process_data(data):
 
     for sentence in data:
         processed_sentence = []
-        # if len(sentence) > 50:
-        #     continue
 
         for word in sentence:
             if vocabulary[word] == 1:
@@ -83,17 +81,55 @@ def save_processed_data(data, filepath):
         f.write(data)
 
 
+def get_word_counts(data):
+    '''
+    Get the counts of each word in data
+    @param data
+    @return vocabulary: defaultdict
+    '''
+    vocabulary = defaultdict(int)
+
+    for sentence in data:
+        for word in sentence:
+            vocabulary[word] += 1
+
+    with open('../data/europarl/vocabulary_processed.pkl', 'wb') as f:
+        pickle.dump(vocabulary, f)
+
+    return vocabulary
+
+
+def reduce_dataset(filepath, savepath, num=20000):
+    '''
+    Reduce the dataset by given num
+    @param filepath
+    @param savepath
+    @num: number of sentences to retain
+    '''
+    with open(filepath, 'r') as f:
+        data = f.read().splitlines()
+
+    data = data[:num]
+
+    with open(savepath, 'w+') as f:
+        f.write('\n'.join(data))
+
+
 if __name__ == '__main__':
 
-    print('-------------------')
-    print('Begin preprocessing')
+    print('-------------------------')
+    print(' - Begin preprocessing')
 
     data = read_training_data()
     data = process_data(data)
     save_path = '../data/europarl/training_processed.en'
     save_processed_data(data, save_path)
 
-    print(' *** Lowercase *** ')
+    print(' - Generate Vocabulary')
+    data = read_training_data('../data/europarl/training_processed.en')
+    vocabulary = get_word_counts(data)
+
+    print(' **** Lowercase **** ')
 
     data = read_training_data(lowercase=True)
     data = process_data(data)
@@ -101,4 +137,4 @@ if __name__ == '__main__':
     save_processed_data(data, save_path)
 
     print(' Done')
-    print('-------------------')
+    print('-------------------------')

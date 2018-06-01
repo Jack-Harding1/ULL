@@ -76,13 +76,15 @@ class EmbeddingExtractor:
         return z_rep_values
 
 
-params_senteval = {'task_path': '',
-                   'usepytorch': False,
-                   'kfold': 10,
-                   'ckpt_path': '',
-                   'tok_path': '',
-                   'extractor': None,
-                   'tks1': None}
+params_senteval = {
+    'task_path': '',
+    'usepytorch': False,
+    'kfold': 10,
+    'ckpt_path': '',
+    'tok_path': '',
+    'extractor': None,
+    'tks1': None
+}
 params_senteval = dotdict(params_senteval)
 
 
