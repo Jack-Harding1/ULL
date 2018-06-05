@@ -29,4 +29,6 @@ __pycache__/
 
 # project 3
 3-evaluating_sentence_reps/models/*
-3-evaluating_sentence_reps/data/*
+3-evaluating_sentence_reps/data/europarl/*
+3-evaluating_sentence_reps/data/hansards/*
+3-evaluating_sentence_reps/data/probing/*
